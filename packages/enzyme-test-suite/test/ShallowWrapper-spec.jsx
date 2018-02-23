@@ -4007,7 +4007,7 @@ describe('shallow', () => {
     it('should return the key of the node', () => {
       const wrapper = shallow((
         <ul>
-          {['foo', 'bar', ''].map(s => <li key={s}>{s}</li>)}
+          {['foo', 'bar'].map(s => <li key={s}>{s}</li>)}
         </ul>
       )).find('li');
       expect(wrapper.at(0).key()).to.equal('foo');

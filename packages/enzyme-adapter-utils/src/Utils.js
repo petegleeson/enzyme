@@ -153,10 +153,6 @@ export function flatten(arrs) {
   return flatArrs;
 }
 
-export function ensureKeyOrUndefined(key) {
-  return key || (key === '' ? '' : undefined);
-}
-
 export function elementToTree(el) {
   if (el === null || typeof el !== 'object' || !('type' in el)) {
     return el;
@@ -178,7 +174,7 @@ export function elementToTree(el) {
     nodeType: nodeTypeFromType(type),
     type,
     props,
-    key: ensureKeyOrUndefined(key),
+    key: key || undefined,
     ref,
     instance: null,
     rendered,

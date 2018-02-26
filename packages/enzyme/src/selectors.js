@@ -140,7 +140,6 @@ function matchAttributeSelector(node, token) {
 
 
 function matchPseudoSelector(node, token, root) {
-  // console.log(token)
   switch (token.name) {
     case 'not': {
       // eslint-disable-next-line no-use-before-define

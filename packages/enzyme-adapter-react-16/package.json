@@ -1,5 +1,5 @@
 {
-  "name": "enzyme-adapter-react-16",
+  "name": "@monastic.panic/enzyme-adapter-react-16",
   "version": "1.1.1",
   "description": "JavaScript Testing utilities for React",
   "homepage": "http://airbnb.io/enzyme/",

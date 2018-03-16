@@ -19,7 +19,7 @@ import {
   createMountWrapper,
   propsWithKeysAndRef,
   ensureKeyOrUndefined,
-} from 'enzyme-adapter-utils';
+} from '@monastic.panic/enzyme-adapter-utils';
 import { findCurrentFiberUsingSlowPath } from 'react-reconciler/reflection';
 
 const HostRoot = 3;

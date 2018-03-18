@@ -181,6 +181,21 @@ describeWithDOM('mount', () => {
       expect(wrapper.find('span').text()).to.equal('foo');
     });
 
+    itIf(REACT163, 'should find elements through forwardedRef elements', () => {
+      const testRef = () => {};
+      const SomeComponent = React.forwardRef((props, ref) => (
+        <div ref={ref}>
+          <span className="child1" />
+          <span className="child2" />
+        </div>
+      ));
+
+      const wrapper = mount(<SomeComponent ref={testRef} />);
+
+      expect(wrapper.find('.child2')).to.have.length(1);
+    });
+
+
     describeIf(!REACT013, 'stateless components', () => {
       it('can pass in context', () => {
         const SimpleComponent = (props, context) => (

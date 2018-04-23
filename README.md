@@ -1,10 +1,20 @@
-Enzyme
-=======
+# Enzyme
+
+# This is a forked version of Enzyme! ⚠️
+
+Why fork? In [Atlaskit](https://atlaskit.atlassian.com/), we depend on Enzyme
+extensively for testing our React components. We have new features that take
+advantage of the [forwardRef API](https://reactjs.org/docs/forwarding-refs.html)
+that was released in React 16.3. As of version 3.3.0 of Enzyme, the library does
+[not support nodes created by forwardRef](https://github.com/airbnb/enzyme/issues/1604).
+The changes in [this PR](https://github.com/airbnb/enzyme/pull/1592) fix this problem.
+
+This fork includes those changes and is intended to be a temporary solution until
+[full React 16.3 support](https://github.com/airbnb/enzyme/issues/1553) is released. Please reach out to us if we can help to get the real release out the door.
 
 [![Join the chat at https://gitter.im/airbnb/enzyme](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/airbnb/enzyme?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![npm Version](https://img.shields.io/npm/v/enzyme.svg)](https://www.npmjs.com/package/enzyme) [![License](https://img.shields.io/npm/l/enzyme.svg)](https://www.npmjs.com/package/enzyme) [![Build Status](https://travis-ci.org/airbnb/enzyme.svg)](https://travis-ci.org/airbnb/enzyme) [![Coverage Status](https://coveralls.io/repos/airbnb/enzyme/badge.svg?branch=master&service=github)](https://coveralls.io/github/airbnb/enzyme?branch=master)
-
 
 Enzyme is a JavaScript Testing utility for React that makes it easier to assert, manipulate,
 and traverse your React Components' output.
@@ -12,8 +22,7 @@ and traverse your React Components' output.
 Enzyme's API is meant to be intuitive and flexible by mimicking jQuery's API for DOM manipulation
 and traversal.
 
-Upgrading from Enzyme 2.x or React < 16
-===========
+# Upgrading from Enzyme 2.x or React < 16
 
 Are you here to check whether or not Enzyme is compatible with React 16? Are you currently using
 Enzyme 2.x? Great! Check out our [migration guide](/docs/guides/migration-from-2-to-3.md) for help
@@ -38,13 +47,13 @@ At the moment, Enzyme has adapters that provide compatibility with `React 16.x`,
 The following adapters are officially provided by enzyme, and have the following compatibility with
 React:
 
-| Enzyme Adapter Package | React semver compatibility |
-| --- | --- |
-| `enzyme-adapter-react-16` | `^16.0.0` |
-| `enzyme-adapter-react-15` | `^15.5.0` |
-| `enzyme-adapter-react-15.4` | `15.0.0-0 - 15.4.x` |
-| `enzyme-adapter-react-14` | `^0.14.0` |
-| `enzyme-adapter-react-13` | `^0.13.0` |
+| Enzyme Adapter Package      | React semver compatibility |
+| --------------------------- | -------------------------- |
+| `enzyme-adapter-react-16`   | `^16.0.0`                  |
+| `enzyme-adapter-react-15`   | `^15.5.0`                  |
+| `enzyme-adapter-react-15.4` | `15.0.0-0 - 15.4.x`        |
+| `enzyme-adapter-react-14`   | `^0.14.0`                  |
+| `enzyme-adapter-react-13`   | `^0.13.0`                  |
 
 Finally, you need to configure enzyme to use the adapter you want it to use. To do this, you can use
 the top level `configure(...)` API.
@@ -56,20 +65,18 @@ import Adapter from 'enzyme-adapter-react-16';
 Enzyme.configure({ adapter: new Adapter() });
 ```
 
-3rd Party Adapters
-=============
+# 3rd Party Adapters
 
 It is possible for the community to create additional (non-official) adapters that will make enzyme
 work with other libraries. If you have made one and it's not included in the list below, feel free
 to make a PR to this README and add a link to it! The known 3rd party adapters are:
 
-| Adapter Package | For Library | Status |
-| --- | --- | --- |
-| [`preact-enzyme-adapter`](https://github.com/aweary/preact-enzyme-adapater) | [`preact`](https://github.com/developit/preact) | (work in progress) |
-|[`enzyme-adapter-inferno`](https://github.com/bbc/enzyme-adapter-inferno)|[`inferno`](https://github.com/infernojs/inferno)|(work in progress)|
+| Adapter Package                                                             | For Library                                       | Status             |
+| --------------------------------------------------------------------------- | ------------------------------------------------- | ------------------ |
+| [`preact-enzyme-adapter`](https://github.com/aweary/preact-enzyme-adapater) | [`preact`](https://github.com/developit/preact)   | (work in progress) |
+| [`enzyme-adapter-inferno`](https://github.com/bbc/enzyme-adapter-inferno)   | [`inferno`](https://github.com/infernojs/inferno) | (work in progress) |
 
-Running Enzyme Tests
-===========
+# Running Enzyme Tests
 
 Enzyme is unopinionated regarding which test runner or assertion library you use, and should be
 compatible with all major test runners and assertion libraries out there. The documentation and
@@ -84,7 +91,6 @@ testing your React components, you can consider using:
 * [`jest-enzyme`](https://github.com/blainekasten/enzyme-matchers/tree/master/packages/jest-enzyme) with Jest.
 * [`should-enzyme`](https://github.com/rkotze/should-enzyme) for should.js.
 * [`expect-enzyme`](https://github.com/PsychoLlama/expect-enzyme) for expect.
-
 
 [Using Enzyme with Mocha](/docs/guides/mocha.md)
 
@@ -106,8 +112,7 @@ testing your React components, you can consider using:
 
 [Using Enzyme with Tape and AVA](/docs/guides/tape-ava.md)
 
-Basic Usage
-===========
+# Basic Usage
 
 ## [Shallow Rendering](/docs/api/shallow.md)
 
@@ -132,11 +137,11 @@ describe('<MyComponent />', () => {
   });
 
   it('renders children when passed in', () => {
-    const wrapper = shallow((
+    const wrapper = shallow(
       <MyComponent>
         <div className="unique" />
-      </MyComponent>
-    ));
+      </MyComponent>,
+    );
     expect(wrapper.contains(<div className="unique" />)).to.equal(true);
   });
 
@@ -150,8 +155,6 @@ describe('<MyComponent />', () => {
 ```
 
 Read the full [API Documentation](/docs/api/shallow.md)
-
-
 
 ## [Full DOM Rendering](/docs/api/mount.md)
 
@@ -173,9 +176,7 @@ describe('<Foo />', () => {
 
   it('simulates click events', () => {
     const onButtonClick = sinon.spy();
-    const wrapper = mount((
-      <Foo onButtonClick={onButtonClick} />
-    ));
+    const wrapper = mount(<Foo onButtonClick={onButtonClick} />);
     wrapper.find('button').simulate('click');
     expect(onButtonClick).to.have.property('callCount', 1);
   });
@@ -190,7 +191,6 @@ describe('<Foo />', () => {
 ```
 
 Read the full [API Documentation](/docs/api/mount.md)
-
 
 ## [Static Rendered Markup](/docs/api/render.md)
 
@@ -216,11 +216,9 @@ describe('<Foo />', () => {
 
 Read the full [API Documentation](/docs/api/render.md)
 
-
 ### Future
 
 [Enzyme Future](/docs/future.md)
-
 
 ### Contributing
 

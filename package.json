@@ -1,5 +1,5 @@
 {
-  "name": "enzyme",
+  "name": "@pgleeson/enzyme",
   "private": true,
   "version": "0.0.1",
   "description": "JavaScript Testing utilities for React",

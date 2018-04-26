@@ -3,7 +3,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { mount, render, ReactWrapper } from '@pgleeson/enzyme';
+import {
+  mount,
+  render,
+  ReactWrapper,
+} from 'enzyme';
 import { ITERATOR_SYMBOL, sym } from 'enzyme/build/Utils';
 
 import './_helpers/setupAdapters';

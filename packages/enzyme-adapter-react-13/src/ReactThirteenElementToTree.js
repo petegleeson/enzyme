@@ -1,4 +1,4 @@
-import { flatten, isArrayLike, ensureKeyOrUndefined } from '@pgleeson/enzyme-adapter-utils';
+import { flatten, isArrayLike, ensureKeyOrUndefined } from 'enzyme-adapter-utils';
 
 export function nodeTypeFromType(type) {
   if (typeof type === 'string') {

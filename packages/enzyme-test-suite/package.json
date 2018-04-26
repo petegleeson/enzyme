@@ -35,7 +35,8 @@
     "object.assign": "^4.1.0",
     "prop-types": "^15.6.0",
     "semver": "^5.5.0",
-    "sinon": "^4.1.6"
+    "sinon": "^4.1.6",
+    "enzyme-adapter-react-16": "1.1.1"
   },
   "peerDependencies": {
     "react": "^15.5.0",

@@ -2,7 +2,7 @@ import React from 'react';
 import { expect } from 'chai';
 import jsdom from 'jsdom';
 import configuration from 'enzyme/build/configuration';
-import { configure, shallow } from '@pgleeson/enzyme';
+import { configure, shallow } from 'enzyme';
 
 import './_helpers/setupAdapters';
 import Adapter from './_helpers/adapter';

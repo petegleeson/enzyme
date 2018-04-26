@@ -1,7 +1,7 @@
 import React from 'react';
 import sinon from 'sinon';
 import { expect } from 'chai';
-import { elementToTree } from '@pgleeson/enzyme-adapter-utils';
+import { elementToTree } from 'enzyme-adapter-utils';
 import {
   hasClassName,
   treeForEach,

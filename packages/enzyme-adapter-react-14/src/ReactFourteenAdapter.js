@@ -5,7 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import TestUtils from 'react-addons-test-utils';
 import values from 'object.values';
-import { EnzymeAdapter } from '@pgleeson/enzyme';
+import { EnzymeAdapter } from 'enzyme';
 import {
   elementToTree,
   mapNativeEventNames,
@@ -16,7 +16,7 @@ import {
   createMountWrapper,
   propsWithKeysAndRef,
   ensureKeyOrUndefined,
-} from '@pgleeson/enzyme-adapter-utils';
+} from 'enzyme-adapter-utils';
 
 function typeToNodeType(type) {
   if (typeof type === 'function') {

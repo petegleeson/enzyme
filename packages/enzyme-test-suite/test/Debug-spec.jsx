@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import React from 'react';
-import { mount, shallow } from '@pgleeson/enzyme';
+import { mount, shallow } from 'enzyme';
 import configuration from 'enzyme/build/configuration';
 import {
   spaces,

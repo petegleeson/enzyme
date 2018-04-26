@@ -6,7 +6,11 @@ import {
   nodeMatches,
   displayNameOfNode,
 } from 'enzyme/build/Utils';
-import { flatten, mapNativeEventNames, propFromEvent } from '@pgleeson/enzyme-adapter-utils';
+import {
+  flatten,
+  mapNativeEventNames,
+  propFromEvent,
+} from 'enzyme-adapter-utils';
 
 import './_helpers/setupAdapters';
 

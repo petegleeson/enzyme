@@ -4,7 +4,7 @@ import ReactAddons from 'react/addons';
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import ReactContext from 'react/lib/ReactContext';
 import values from 'object.values';
-import { EnzymeAdapter } from 'enzyme';
+import { EnzymeAdapter } from '@pgleeson/enzyme';
 import {
   propFromEvent,
   withSetStateAllowed,
@@ -13,7 +13,7 @@ import {
   createMountWrapper,
   propsWithKeysAndRef,
   ensureKeyOrUndefined,
-} from 'enzyme-adapter-utils';
+} from '@pgleeson/enzyme-adapter-utils';
 import mapNativeEventNames from './ReactThirteenMapNativeEventNames';
 import elementToTree from './ReactThirteenElementToTree';
 

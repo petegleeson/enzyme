@@ -7,7 +7,7 @@ import TestUtils from 'react-dom/test-utils';
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import ShallowRenderer from 'react-test-renderer/shallow';
 import values from 'object.values';
-import { EnzymeAdapter } from 'enzyme';
+import { EnzymeAdapter } from '@pgleeson/enzyme';
 import {
   elementToTree,
   mapNativeEventNames,
@@ -18,7 +18,7 @@ import {
   createMountWrapper,
   propsWithKeysAndRef,
   ensureKeyOrUndefined,
-} from 'enzyme-adapter-utils';
+} from '@pgleeson/enzyme-adapter-utils';
 
 function compositeTypeToNodeType(type) {
   switch (type) {

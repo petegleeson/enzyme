@@ -1,6 +1,6 @@
 import React from 'react';
-import Enzyme, { shallow, mount } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
+import Enzyme, { shallow, mount } from '@pgleeson/enzyme';
+import Adapter from '@pgleeson/enzyme-adapter-react-16';
 import { expect } from 'chai';
 import Foo from '../src/Foo';
 

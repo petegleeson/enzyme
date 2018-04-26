@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { shallow, render, ShallowWrapper, mount } from 'enzyme';
+import { shallow, render, ShallowWrapper, mount } from '@pgleeson/enzyme';
 import { ITERATOR_SYMBOL, withSetStateAllowed, sym } from 'enzyme/build/Utils';
 
 import './_helpers/setupAdapters';

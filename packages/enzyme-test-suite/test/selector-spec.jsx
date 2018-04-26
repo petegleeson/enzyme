@@ -1,9 +1,6 @@
 import React from 'react';
 import { expect } from 'chai';
-import {
-  mount,
-  shallow,
-} from 'enzyme';
+import { mount, shallow } from '@pgleeson/enzyme';
 
 import './_helpers/setupAdapters';
 import { describeWithDOM } from './_helpers';

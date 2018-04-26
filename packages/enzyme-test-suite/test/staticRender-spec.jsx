@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { expect } from 'chai';
-import { render } from 'enzyme';
+import { render } from '@pgleeson/enzyme';
 
 import './_helpers/setupAdapters';
 import { describeWithDOM, describeIf } from './_helpers';

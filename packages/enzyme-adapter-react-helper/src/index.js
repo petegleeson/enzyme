@@ -1,4 +1,4 @@
-import { configure } from 'enzyme';
+import { configure } from '@pgleeson/enzyme';
 
 export default function setupEnzymeAdapter(enzymeOptions = {}, adapterOptions = {}) {
   let Adapter;

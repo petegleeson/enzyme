@@ -7,7 +7,7 @@ import ReactDOMServer from 'react-dom/server';
 import ShallowRenderer from 'react-test-renderer/shallow';
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import TestUtils from 'react-dom/test-utils';
-import { EnzymeAdapter } from 'enzyme';
+import { EnzymeAdapter } from '@pgleeson/enzyme';
 import {
   elementToTree,
   nodeTypeFromType,
@@ -19,7 +19,7 @@ import {
   createMountWrapper,
   propsWithKeysAndRef,
   ensureKeyOrUndefined,
-} from 'enzyme-adapter-utils';
+} from '@pgleeson/enzyme-adapter-utils';
 import { findCurrentFiberUsingSlowPath } from 'react-reconciler/reflection';
 
 const HostRoot = 3;

@@ -9,13 +9,14 @@ import {
   debugNodes,
 } from 'enzyme/build/Debug';
 
+import { forwardRef } from './_helpers/react-compat';
 import './_helpers/setupAdapters';
 import {
   describeWithDOM,
   describeIf,
   itIf,
 } from './_helpers';
-import { REACT013 } from './_helpers/version';
+import { REACT013, REACT163 } from './_helpers/version';
 
 const { adapter } = configuration.get();
 
@@ -749,4 +750,21 @@ describe('debug', () => {
       ));
     });
   });
+
+  describeIf(REACT163, 'forwarded ref Components', () => {
+    it('should show correct displayName', () => {
+      const MyButton = forwardRef((props, ref) => <button ref={ref}>{props.children}</button>);
+      MyButton.displayName = 'BasicButton';
+
+      const wrapper = mount(<MyButton>Click me</MyButton>);
+      expect(wrapper.debug()).to.equal((
+        `<ForwardRef(${MyButton.displayName})>
+  <button>
+    Click me
+  </button>
+</ForwardRef(${MyButton.displayName})>`
+      ));
+    });
+  });
+
 });

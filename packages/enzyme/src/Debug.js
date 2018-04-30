@@ -7,13 +7,7 @@ import isNumber from 'is-number-object';
 import isCallable from 'is-callable';
 import isBoolean from 'is-boolean-object';
 import inspect from 'object-inspect';
-
 import {
-  propsOfNode,
-  childrenOfNode,
-} from './RSTTraversal';
-import {
-  typeOf,
   AsyncMode,
   ContextProvider,
   ContextConsumer,
@@ -22,21 +16,37 @@ import {
   Fragment,
   Portal,
   StrictMode,
-} from './Utils';
+} from 'react-is';
+
+import {
+  propsOfNode,
+  childrenOfNode,
+} from './RSTTraversal';
 
 const booleanValue = Function.bind.call(Function.call, Boolean.prototype.valueOf);
 
+// The node type can be defined in three different places.
+// Where the type is depends on the node and rendering strategy.
+// This function looks in the three spots and returns the type.
+const getNodeType = (node) => {
+  if (node.type && node.type.$$typeof) {
+    return node.type.$$typeof;
+  } else if (node.$$typeof) {
+    return node.$$typeof;
+  }
+  return node.type;
+};
 
 export function typeName(node) {
   const { type } = node;
-  switch (typeOf(node)) {
+  switch (getNodeType(node)) {
     case AsyncMode: return 'AsyncMode';
     case ContextProvider: return 'ContextProvider';
     case ContextConsumer: return 'ContextConsumer';
     case Portal: return 'Portal';
     case StrictMode: return 'StrictMode';
     case ForwardRef: {
-      const name = type.render.displayName || functionName(type.render);
+      const name = type.displayName || functionName(type.render);
       return name ? `ForwardRef(${name})` : 'ForwardRef';
     }
     case Fragment:

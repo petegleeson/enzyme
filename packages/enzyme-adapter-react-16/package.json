@@ -1,6 +1,6 @@
 {
   "name": "@pgleeson/enzyme-adapter-react-16",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "JavaScript Testing utilities for React",
   "homepage": "http://airbnb.io/enzyme/",
   "main": "build",
@@ -43,7 +43,7 @@
     "react-test-renderer": "^16.0.0-0"
   },
   "peerDependencies": {
-    "enzyme": "https://registry.npmjs.org/@pgleeson/enzyme/-/enzyme-3.3.0.tgz",
+    "enzyme": "https://registry.npmjs.org/@pgleeson/enzyme/-/enzyme-3.3.2.tgz",
     "react": "^16.0.0-0",
     "react-dom": "^16.0.0-0"
   },

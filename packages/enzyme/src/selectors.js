@@ -4,6 +4,7 @@ import isEmpty from 'lodash/isEmpty';
 import flatten from 'lodash/flatten';
 import unique from 'lodash/uniq';
 import is from 'object-is';
+import { isValidElementType } from 'react-is';
 import has from 'has';
 import {
   treeFilter,
@@ -216,12 +217,19 @@ function isComplexSelector(tokens) {
  * @param {Function|Object|String} selector
  */
 export function buildPredicate(selector) {
-  // If the selector is a function, check if the node's constructor matches
-  if (typeof selector === 'function') {
+  if (typeof selector === 'string') {
+    // If the selector is a string, parse it as a simple CSS selector
+    const tokens = safelyGenerateTokens(selector);
+    if (isComplexSelector(tokens)) {
+      throw new TypeError('This method does not support complex CSS selectors');
+    }
+    // Simple selectors only have a single selector token
+    return buildPredicateFromToken(tokens[0]);
+  } else if (isValidElementType(selector)) {
+    // If the selector is a react element, check if the node's constructor matches
     return node => node && node.type === selector;
-  }
-  // If the selector is an non-empty object, treat the keys/values as props
-  if (typeof selector === 'object') {
+  } else if (typeof selector === 'object') {
+    // If the selector is an non-empty object, treat the keys/values as props
     if (!Array.isArray(selector) && selector !== null && !isEmpty(selector)) {
       const hasUndefinedValues = values(selector).some(value => typeof value === 'undefined');
       if (hasUndefinedValues) {
@@ -230,15 +238,6 @@ export function buildPredicate(selector) {
       return node => nodeMatchesObjectProps(node, selector);
     }
     throw new TypeError('Enzyme::Selector does not support an array, null, or empty object as a selector');
-  }
-  // If the selector is a string, parse it as a simple CSS selector
-  if (typeof selector === 'string') {
-    const tokens = safelyGenerateTokens(selector);
-    if (isComplexSelector(tokens)) {
-      throw new TypeError('This method does not support complex CSS selectors');
-    }
-    // Simple selectors only have a single selector token
-    return buildPredicateFromToken(tokens[0]);
   }
   throw new TypeError('Enzyme::Selector expects a string, object, or Component Constructor');
 }

@@ -113,11 +113,21 @@ function toTree(vnode) {
     }
     case HostText: // 6
       return node.memoizedProps;
+    case ForwardRef: {
+      return {
+        nodeType: 'function',
+        type: node.type,
+        props: { ...node.pendingProps },
+        key: ensureKeyOrUndefined(node.key),
+        ref: node.ref,
+        instance: null,
+        rendered: childrenToTree(node.child),
+      };
+    }
     case Fragment:
     case ContextProvider:
     case ContextConsumer:
     case Mode:
-    case ForwardRef:
       return childrenToTree(node.child);
     default:
       throw new Error(`Enzyme Internal Error: unknown node with tag ${node.tag}`);

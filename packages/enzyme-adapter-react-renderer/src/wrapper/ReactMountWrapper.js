@@ -2,7 +2,7 @@ import React from 'react';
 import cheerio from 'cheerio';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
-import ReactTestRendererAdapter from './ReactTestRendererAdapter';
+import ReactTestRendererAdapter from '../adapter/ReactTestRendererAdapter';
 import ReactTestInstance from './ReactTestInstance';
 
 import { reduceTreesBySelector } from './selectors';
@@ -15,11 +15,11 @@ const flatMap = (collection, fn) =>
 const instanceToElement = instance => React.createElement(instance.type, instance.props);
 
 class ReactMountWrapper {
-  constructor(instances, rootWrapper, rootNode) {
+  constructor(instances, rootRef, renderer) {
     // private api
     this.instances = instances;
-    this.rootWrapper = rootWrapper;
-    this.rootNode = rootNode;
+    this.rootRef = rootRef;
+    this.renderer = renderer;
     // public api
     this.length = instances.length;
   }
@@ -31,7 +31,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   at(index) {
-    return new ReactMountWrapper([this.instances[index]], this.rootWrapper, this.rootNode);
+    return new ReactMountWrapper([this.instances[index]], this.rootRef, this.renderer);
   }
 
   /**
@@ -43,8 +43,8 @@ class ReactMountWrapper {
   children(selector) {
     return new ReactMountWrapper(
       flatMap(this.instances, instance => instance.children),
-      this.rootWrapper,
-      this.rootNode,
+      this.rootRef,
+      this.renderer,
     );
   }
 
@@ -81,8 +81,8 @@ class ReactMountWrapper {
   find(selector) {
     return new ReactMountWrapper(
       reduceTreesBySelector(selector, this.instances),
-      this.rootWrapper,
-      this.rootNode,
+      this.rootRef,
+      this.renderer,
     );
   }
 
@@ -97,9 +97,9 @@ class ReactMountWrapper {
     return new ReactMountWrapper(
       flatMap(this.instances, instance =>
         instance.findAll(testInstance =>
-          predicate(new ReactMountWrapper([testInstance], this.rootWrapper, this.rootNode)))),
-      this.rootWrapper,
-      this.rootNode,
+          predicate(new ReactMountWrapper([testInstance], this.rootRef, this.renderer)))),
+      this.rootRef,
+      this.renderer,
     );
   }
 
@@ -150,7 +150,7 @@ class ReactMountWrapper {
 
   isRoot() {
     const [first] = this.instances;
-    return first && first.parent.instance !== this.rootWrapper;
+    return first && first.parent.instance !== this.rootRef;
   }
 
   /**
@@ -225,7 +225,7 @@ class ReactMountWrapper {
     if (!this.instances[0].parent.props.context) {
       throw new Error('ShallowWrapper::setContext() can only be called on a wrapper that was originally passed a context option');
     }
-    this.rootWrapper.setChildProps({}, context);
+    this.rootRef.setChildProps({}, context);
     return this;
   }
 
@@ -349,9 +349,9 @@ class ReactMountWrapper {
 const createWrapper = (rootNode, passedOptions = {}) => {
   const adapter = new ReactTestRendererAdapter();
   const renderer = adapter.createMountRenderer(passedOptions);
-  const rootWrapper = renderer.render(rootNode, passedOptions.context);
-  const rootInstance = new ReactTestInstance(rootWrapper._reactInternalFiber);
-  return new ReactMountWrapper(rootInstance.children, rootWrapper, rootNode);
+  const rootRef = renderer.render(rootNode, passedOptions.context);
+  const rootInstance = new ReactTestInstance(rootRef._reactInternalFiber);
+  return new ReactMountWrapper(rootInstance.children, rootRef, renderer);
 };
 
 module.exports = createWrapper;

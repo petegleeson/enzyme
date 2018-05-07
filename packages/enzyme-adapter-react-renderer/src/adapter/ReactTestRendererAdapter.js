@@ -1,7 +1,8 @@
 import { EnzymeAdapter } from 'enzyme';
-import { createMountWrapper } from 'enzyme-adapter-utils';
+import { createMountWrapper, mapNativeEventNames } from 'enzyme-adapter-utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import TestUtils from 'react-dom/test-utils';
 
 class ReactTestRendererAdapter extends EnzymeAdapter {
   constructor() {
@@ -28,6 +29,14 @@ class ReactTestRendererAdapter extends EnzymeAdapter {
         }
         return instance;
       },
+      simulateEvent(node, event, mock) {
+        const mappedEvent = mapNativeEventNames(event);
+        const eventFn = TestUtils.Simulate[mappedEvent];
+        if (!eventFn) {
+          throw new TypeError(`ReactWrapper::simulate() event '${event}' does not exist`);
+        }
+        eventFn(ReactDOM.findDOMNode(node), mock);
+      },
       unmount() {
         ReactDOM.unmountComponentAtNode(domNode);
         instance = null;
@@ -36,7 +45,8 @@ class ReactTestRendererAdapter extends EnzymeAdapter {
   }
   createRenderer(options) {
     switch (options.mode) {
-      case EnzymeAdapter.MODES.MOUNT: return this.createMountRenderer(options);
+      case EnzymeAdapter.MODES.MOUNT:
+        return this.createMountRenderer(options);
       default:
         throw new Error(`Enzyme Internal Error: Unrecognized mode: ${options.mode}`);
     }

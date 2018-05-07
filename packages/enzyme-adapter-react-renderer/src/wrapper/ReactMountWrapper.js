@@ -281,6 +281,21 @@ class ReactMountWrapper {
   }
 
   /**
+   * Used to simulate events. Pass an eventname and (optionally) event arguments. This method of
+   * testing events should be met with some skepticism.
+   *
+   * @param {String} event
+   * @param {Object} mock (optional)
+   * @returns {ReactWrapper}
+   */
+  simulate(event, mock = {}) {
+    this.single('simulate', (instance) => {
+      this.renderer.simulateEvent(instance.instance, event, mock);
+    });
+    return this;
+  }
+
+  /**
    * Utility method that throws an error if the current instance has a length other than one.
    * This is primarily used to enforce that certain methods are only run on a wrapper when it is
    * wrapping a single node.

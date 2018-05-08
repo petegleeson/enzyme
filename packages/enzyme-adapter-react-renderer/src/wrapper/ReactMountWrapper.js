@@ -263,7 +263,7 @@ class ReactMountWrapper {
     if (typeof callback !== 'function') {
       throw new TypeError('ReactWrapper::setProps() expects a function as its second argument');
     }
-    this.rootWrapper.setChildProps(props, {}, callback);
+    this.rootRef.setChildProps(props, {}, callback);
     return this;
   }
 

@@ -5,6 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import ReactTestRendererAdapter from '../adapter/ReactTestRendererAdapter';
 import ReactTestInstance from './ReactTestInstance';
 
+import { containsChildrenSubArray, nodeEqual, treeFilter } from './contains';
 import { debugNodes } from './debug';
 import { reduceTreesBySelector } from './selectors';
 
@@ -14,6 +15,19 @@ const flatMap = (collection, fn) =>
   collection.map(fn).reduce((existing, curr) => [...existing, ...curr], []);
 
 const instanceToElement = instance => React.createElement(instance.type, instance.props);
+
+/**
+ * Finds all nodes in the current wrapper nodes' render trees that match the provided predicate
+ * function.
+ *
+ * @param {ReactWrapper} wrapper
+ * @param {Function} predicate
+ * @param {Function} filter
+ * @returns {ReactWrapper}
+ */
+function findWhereUnwrapped(instances, predicate, filter = treeFilter) {
+  return flatMap(instances, n => filter(n, predicate));
+}
 
 class ReactMountWrapper {
   constructor(instances, rootRef, renderer) {
@@ -47,6 +61,34 @@ class ReactMountWrapper {
       this.rootRef,
       this.renderer,
     );
+  }
+
+  /**
+   * Whether or not a given react element exists in the mount render tree.
+   *
+   * Example:
+   * ```
+   * const wrapper = mount(<MyComponent />);
+   * expect(wrapper.contains(<div className="foo bar" />)).to.equal(true);
+   * ```
+   *
+   * @param {ReactElement|Array<ReactElement>} nodeOrNodes
+   * @returns {Boolean}
+   */
+  contains(nodeOrNodes) {
+    const adapter = new ReactTestRendererAdapter();
+    const renderer = adapter.createMountRenderer({});
+    const componentRef = renderer.render(nodeOrNodes);
+    const argInstance = new ReactTestInstance(componentRef._reactInternalFiber);
+    const predicate = Array.isArray(nodeOrNodes)
+      ? other => containsChildrenSubArray(
+        nodeEqual,
+        other,
+        argInstance.children,
+      )
+      : other => nodeEqual(argInstance.children[0], other);
+
+    return findWhereUnwrapped(this.instances, predicate).length > 0;
   }
 
   /**

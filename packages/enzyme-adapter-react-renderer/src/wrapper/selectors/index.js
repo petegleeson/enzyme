@@ -392,3 +392,5 @@ export function reduceTreesBySelector(selector, roots) {
   const results = roots.map(n => reduceTreeBySelector(selector, n));
   return unique(flatten(results));
 }
+
+export { hasClassName };

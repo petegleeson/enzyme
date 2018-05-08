@@ -8,7 +8,7 @@ import ReactTestInstance from './ReactTestInstance';
 
 import { containsChildrenSubArray, nodeEqual, treeFilter } from './contains';
 import { debugNodes } from './debug';
-import { reduceTreesBySelector, buildPredicate } from './selectors';
+import { reduceTreesBySelector, buildPredicate, hasClassName } from './selectors';
 
 const noop = () => {};
 
@@ -64,13 +64,24 @@ class ReactMountWrapper {
   }
 
   /**
+   * Returns a new wrapper with a specific child
+   *
+   * @param {Number} [index]
+   * @returns {ReactWrapper}
+   */
+  childAt(index) {
+    return this.single('childAt', () => this.children().at(index));
+  }
+
+  /**
    * Returns a new wrapper with all of the children of the current wrapper.
    *
    * @param {String|Function} [selector]
    * @returns {ReactWrapper}
    */
   children(selector) {
-    return this.wrap(flatMap(this.instances, instance => instance.children));
+    const childWrapper = this.wrap(flatMap(this.instances, instance => instance.children));
+    return selector ? childWrapper.filter(selector) : childWrapper;
   }
 
   /**
@@ -193,6 +204,22 @@ class ReactMountWrapper {
   }
 
   /**
+   * Returns whether or not the current root node has the given class name or not.
+   *
+   * NOTE: can only be called on a wrapper of a single node.
+   *
+   * @param {String} className
+   * @returns {Boolean}
+   */
+  hasClass(className) {
+    if (className && className.indexOf('.') !== -1) {
+      // eslint-disable-next-line no-console
+      console.warn('It looks like you\'re calling `ReactWrapper::hasClass()` with a CSS selector. hasClass() expects a class name, not a CSS selector.');
+    }
+    return this.single('hasClass', n => hasClassName(n, className));
+  }
+
+  /**
    * Strips out all the not host-nodes from the list of nodes
    *
    * This method is useful if you want to check for the presence of host nodes
@@ -227,6 +254,19 @@ class ReactMountWrapper {
    */
   instance() {
     return this.single('instance', instance => instance.instance);
+  }
+
+  /**
+   * Returns whether or not current node matches a provided selector.
+   *
+   * NOTE: can only be called on a wrapper of a single node.
+   *
+   * @param {String|Function} selector
+   * @returns {boolean}
+   */
+  is(selector) {
+    const predicate = buildPredicate(selector);
+    return this.single('is', n => predicate(n));
   }
 
   /**

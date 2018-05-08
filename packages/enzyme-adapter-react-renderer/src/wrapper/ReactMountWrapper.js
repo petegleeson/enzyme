@@ -1,5 +1,6 @@
 import React from 'react';
 import cheerio from 'cheerio';
+import compact from 'lodash/compact';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import ReactTestRendererAdapter from '../adapter/ReactTestRendererAdapter';
@@ -7,7 +8,7 @@ import ReactTestInstance from './ReactTestInstance';
 
 import { containsChildrenSubArray, nodeEqual, treeFilter } from './contains';
 import { debugNodes } from './debug';
-import { reduceTreesBySelector } from './selectors';
+import { reduceTreesBySelector, buildPredicate } from './selectors';
 
 const noop = () => {};
 
@@ -20,13 +21,25 @@ const instanceToElement = instance => React.createElement(instance.type, instanc
  * Finds all nodes in the current wrapper nodes' render trees that match the provided predicate
  * function.
  *
- * @param {ReactWrapper} wrapper
+ * @param {Array<ReactTestInstance>} instances
  * @param {Function} predicate
  * @param {Function} filter
- * @returns {ReactWrapper}
+ * @returns {Array<ReactTestInstance>}
  */
 function findWhereUnwrapped(instances, predicate, filter = treeFilter) {
   return flatMap(instances, n => filter(n, predicate));
+}
+
+/**
+ * instances t wrapper instance that match
+ * the provided predicate function.
+ *
+ * @param {Array<ReactTestInstance>} instances
+ * @param {Function} predicate
+ * @returns {Array<ReactTestInstance>}
+ */
+function filterWhereUnwrapped(instances, predicate) {
+  return compact(instances.filter(predicate));
 }
 
 class ReactMountWrapper {
@@ -128,6 +141,37 @@ class ReactMountWrapper {
   }
 
   /**
+   * Returns a new wrapper instance with only the nodes of the current wrapper instance that match
+   * the provided selector.
+   *
+   * @param {String|Function} selector
+   * @returns {ReactWrapper}
+   */
+  filter(selector) {
+    const predicate = buildPredicate(selector);
+    return new ReactMountWrapper(
+      filterWhereUnwrapped(this.instances, predicate),
+      this.rootRef,
+      this.renderer
+    );
+  }
+
+  /**
+   * Returns a new wrapper instance with only the nodes of the current wrapper instance that match
+   * the provided predicate function.
+   *
+   * @param {Function} predicate
+   * @returns {ReactWrapper}
+   */
+  filterWhere(predicate) {
+    return new ReactMountWrapper(
+      filterWhereUnwrapped(this.instances, predicate),
+      this.rootRef,
+      this.renderer
+    );
+  }
+
+  /**
    * Finds every node in the render tree of the current wrapper that matches the provided selector.
    *
    * @param {String|Function} selector
@@ -165,6 +209,16 @@ class ReactMountWrapper {
    */
   first() {
     return this.at(0);
+  }
+
+  /**
+   * Strips out all the not host-nodes from the list of nodes
+   *
+   * This method is useful if you want to check for the presence of host nodes
+   * (actually rendered HTML elements) ignoring the React nodes.
+   */
+  hostNodes() {
+    return this.filterWhere(n => typeof n.type === 'string');
   }
 
   /**

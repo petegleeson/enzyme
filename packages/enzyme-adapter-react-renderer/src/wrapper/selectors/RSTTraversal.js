@@ -1,6 +1,6 @@
 import entries from 'object.entries';
 import isSubset from 'is-subset';
-import { propsOfNode } from './Utils';
+import { propsOfNode } from '../common';
 
 export function hasClassName(node, className) {
   let classes = propsOfNode(node).className || '';

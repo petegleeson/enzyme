@@ -5,6 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import ReactTestRendererAdapter from '../adapter/ReactTestRendererAdapter';
 import ReactTestInstance from './ReactTestInstance';
 
+import { debugNodes } from './debug';
 import { reduceTreesBySelector } from './selectors';
 
 const noop = () => {};
@@ -46,6 +47,18 @@ class ReactMountWrapper {
       this.rootRef,
       this.renderer,
     );
+  }
+
+  /**
+   * Returns an HTML-like string of the shallow render for debugging purposes.
+   *
+   * @param {Object} [options] - Property bag of additional options.
+   * @param {boolean} [options.ignoreProps] - if true, props are omitted from the string.
+   * @param {boolean} [options.verbose] - if true, arrays and objects to be verbosely printed.
+   * @returns {String}
+   */
+  debug(options = {}) {
+    return debugNodes(this.instances, options);
   }
 
   /**

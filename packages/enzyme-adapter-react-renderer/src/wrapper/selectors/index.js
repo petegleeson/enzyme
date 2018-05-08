@@ -6,7 +6,8 @@ import unique from 'lodash/uniq';
 import is from 'object-is';
 import has from 'has';
 import { nodeHasId, nodeMatchesObjectProps, hasClassName } from './RSTTraversal';
-import { nodeHasType, propsOfNode } from './Utils';
+import { nodeHasType } from './Utils';
+import { propsOfNode } from '../common';
 // our CSS selector parser instance
 const parser = createParser();
 

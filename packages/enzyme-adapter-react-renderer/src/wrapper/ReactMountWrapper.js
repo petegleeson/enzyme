@@ -11,7 +11,7 @@ import { reduceTreesBySelector } from './selectors';
 const noop = () => {};
 
 const flatMap = (collection, fn) =>
-  collection.map(fn).reduce((curr, existing) => [...existing, ...curr], []);
+  collection.map(fn).reduce((existing, curr) => [...existing, ...curr], []);
 
 const instanceToElement = instance => React.createElement(instance.type, instance.props);
 
@@ -359,7 +359,20 @@ class ReactMountWrapper {
   text() {
     return this.single(
       'text',
-      instance => (instance.instance ? ReactDOM.findDOMNode(instance.instance).textContent : ''),
+      (instance) => {
+        const findAllFirst = (current, filterFn) => {
+          if (filterFn(current)) {
+            return [current];
+          } else if (!current.children || current.children.length === 0) {
+            return [];
+          }
+          return flatMap(current.children, child => findAllFirst(child, filterFn));
+        };
+        return findAllFirst(instance, inst => !!inst.instance || typeof inst === 'string')
+          .map(result => (result.instance ?
+            ReactDOM.findDOMNode(result.instance).textContent : result))
+          .join('');
+      },
     );
   }
 

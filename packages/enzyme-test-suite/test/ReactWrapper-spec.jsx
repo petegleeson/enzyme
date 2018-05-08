@@ -1859,6 +1859,32 @@ describeWithDOM('mount', () => {
       expect(wrapper.text()).to.equal('footest');
     });
 
+    it('should handle multiple levels of SFCs', () => {
+      const Bar = ({ children }) => children;
+      const Foo = () => <div>d</div>;
+      const wrapper = mount((
+        <Bar>
+          <Bar>
+            <Bar>
+              <Bar>
+                <div>a</div>
+                <div>b</div>
+                <div>c</div>
+              </Bar>
+            </Bar>
+          </Bar>
+          <Foo />
+        </Bar>
+      ));
+      expect(wrapper.text()).to.equal('abcd');
+    });
+
+    it('should handle SFCs that render strings', () => {
+      const Bar = () => 'hi';
+      const wrapper = mount(<Bar />);
+      expect(wrapper.text()).to.equal('hi');
+    });
+
     it('should handle html entities', () => {
       matchesRender(<div>&gt;</div>);
     });

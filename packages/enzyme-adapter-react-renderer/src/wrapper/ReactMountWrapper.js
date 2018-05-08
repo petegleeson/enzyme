@@ -43,10 +43,11 @@ function filterWhereUnwrapped(instances, predicate) {
 }
 
 class ReactMountWrapper {
-  constructor(instances, rootRef, renderer) {
+  constructor(instances, rootRef, rootElement, renderer) {
     // private api
     this.instances = instances;
     this.rootRef = rootRef;
+    this.rootElement = rootElement;
     this.renderer = renderer;
     // public api
     this.length = instances.length;
@@ -59,7 +60,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   at(index) {
-    return new ReactMountWrapper([this.instances[index]], this.rootRef, this.renderer);
+    return this.wrap([this.instances[index]]);
   }
 
   /**
@@ -69,11 +70,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   children(selector) {
-    return new ReactMountWrapper(
-      flatMap(this.instances, instance => instance.children),
-      this.rootRef,
-      this.renderer,
-    );
+    return this.wrap(flatMap(this.instances, instance => instance.children));
   }
 
   /**
@@ -126,7 +123,7 @@ class ReactMountWrapper {
    * @returns {*}
    */
   context(name) {
-    if (this.isRoot()) {
+    if (!this.isRoot()) {
       throw new Error('ReactWrapper::context() can only be called on the root');
     }
     const rootInstance = this.single('context', instance => instance.instance);
@@ -149,11 +146,7 @@ class ReactMountWrapper {
    */
   filter(selector) {
     const predicate = buildPredicate(selector);
-    return new ReactMountWrapper(
-      filterWhereUnwrapped(this.instances, predicate),
-      this.rootRef,
-      this.renderer
-    );
+    return this.wrap(filterWhereUnwrapped(this.instances, predicate));
   }
 
   /**
@@ -164,11 +157,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   filterWhere(predicate) {
-    return new ReactMountWrapper(
-      filterWhereUnwrapped(this.instances, predicate),
-      this.rootRef,
-      this.renderer
-    );
+    return this.wrap(filterWhereUnwrapped(this.instances, predicate));
   }
 
   /**
@@ -178,11 +167,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   find(selector) {
-    return new ReactMountWrapper(
-      reduceTreesBySelector(selector, this.instances),
-      this.rootRef,
-      this.renderer,
-    );
+    return this.wrap(reduceTreesBySelector(selector, this.instances));
   }
 
   /**
@@ -193,13 +178,9 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   findWhere(predicate) {
-    return new ReactMountWrapper(
-      flatMap(this.instances, instance =>
-        instance.findAll(testInstance =>
-          predicate(new ReactMountWrapper([testInstance], this.rootRef, this.renderer)))),
-      this.rootRef,
-      this.renderer,
-    );
+    return this.wrap(flatMap(this.instances, instance =>
+      instance.findAll(testInstance =>
+        predicate(this.wrap([testInstance])))));
   }
 
   /**
@@ -259,7 +240,7 @@ class ReactMountWrapper {
 
   isRoot() {
     const [first] = this.instances;
-    return first && first.parent.instance !== this.rootRef;
+    return first && first.parent.instance === this.rootRef;
   }
 
   /**
@@ -269,6 +250,21 @@ class ReactMountWrapper {
    */
   last() {
     return this.at(this.length - 1);
+  }
+
+  /**
+   * A method that re-mounts the component, if it is not currently mounted.
+   * This can be used to simulate a component going through
+   * an unmount/mount lifecycle.
+   *
+   * @returns {ReactWrapper}
+   */
+  mount() {
+    if (!this.isRoot()) {
+      throw new Error('ReactWrapper::mount() can only be called on the root');
+    }
+    this.renderer.render(this.rootElement, {});
+    return this;
   }
 
   /**
@@ -328,7 +324,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   setContext(context) {
-    if (this.isRoot()) {
+    if (!this.isRoot()) {
       throw new Error('ReactWrapper::setContext() can only be called on the root');
     }
     if (!this.instances[0].parent.props.context) {
@@ -353,7 +349,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   setProps(props, callback = noop) {
-    if (this.isRoot()) {
+    if (!this.isRoot()) {
       throw new Error('ReactWrapper::setProps() can only be called on the root');
     }
     if (typeof callback !== 'function') {
@@ -377,7 +373,7 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   setState(state, callback = noop) {
-    if (this.isRoot()) {
+    if (!this.isRoot()) {
       throw new Error('ReactWrapper::setState() can only be called on the root');
     }
     if (typeof callback !== 'function') {
@@ -433,7 +429,7 @@ class ReactMountWrapper {
    * @returns {*}
    */
   state(name) {
-    if (this.isRoot()) {
+    if (!this.isRoot()) {
       throw new Error('ReactWrapper::state() can only be called on the root');
     }
     const _state = this.single('state', instance => instance.instance.state);
@@ -481,14 +477,41 @@ class ReactMountWrapper {
   type() {
     return this.single('type', instance => instance.type);
   }
+
+  /**
+   * A method that unmounts the component. This can be used to simulate a component going through
+   * and unmount/mount lifecycle.
+   *
+   * @returns {ReactWrapper}
+   */
+  unmount() {
+    if (!this.isRoot()) {
+      throw new Error('ReactWrapper::unmount() can only be called on the root');
+    }
+    this.single('unmount', () => {
+      this.renderer.unmount();
+    });
+    return this;
+  }
+
+  /**
+   * Helpful utility method to create a new wrapper with the same root as the current wrapper, with
+   * any nodes passed in as the first parameter automatically wrapped.
+   *
+   * @param {Array<ReactTestInstance>} instances
+   * @returns {ReactWrapper}
+   */
+  wrap(instances) {
+    return new ReactMountWrapper(instances, this.rootRef, this.rootNode, this.renderer);
+  }
 }
 
-const createWrapper = (rootNode, passedOptions = {}) => {
+const createWrapper = (rootElement, passedOptions = {}) => {
   const adapter = new ReactTestRendererAdapter();
   const renderer = adapter.createMountRenderer(passedOptions);
-  const rootRef = renderer.render(rootNode, passedOptions.context);
+  const rootRef = renderer.render(rootElement, passedOptions.context);
   const rootInstance = new ReactTestInstance(rootRef._reactInternalFiber);
-  return new ReactMountWrapper(rootInstance.children, rootRef, renderer);
+  return new ReactMountWrapper(rootInstance.children, rootRef, rootElement, renderer);
 };
 
 module.exports = createWrapper;

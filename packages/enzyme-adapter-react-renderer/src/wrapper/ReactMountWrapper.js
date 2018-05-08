@@ -1,6 +1,8 @@
 import React from 'react';
 import cheerio from 'cheerio';
 import compact from 'lodash/compact';
+import flatten from 'lodash/flatten';
+import unique from 'lodash/uniq';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import ReactTestRendererAdapter from '../adapter/ReactTestRendererAdapter';
@@ -44,6 +46,7 @@ function filterWhereUnwrapped(instances, predicate) {
 
 class ReactMountWrapper {
   constructor(instances, rootRef, rootElement, renderer) {
+
     // private api
     this.instances = instances;
     this.rootRef = rootRef;
@@ -204,6 +207,22 @@ class ReactMountWrapper {
   }
 
   /**
+   * Utility method used to create new wrappers with a mapping function that returns an array of
+   * nodes in response to a single node wrapper. The returned wrapper is a single wrapper around
+   * all of the mapped nodes flattened (and de-duplicated).
+   *
+   * @param {Function} fn
+   * @returns {ReactWrapper}
+   */
+  flatMap(fn) {
+    const nodes = this.instances.map((n, i) => fn.call(this, this.wrap(n), i));
+    const flattened = flatten(nodes, true);
+    const uniques = unique(flattened);
+    const compacted = compact(uniques);
+    return this.wrap(compacted);
+  }
+
+  /**
    * Returns whether or not the current root node has the given class name or not.
    *
    * NOTE: can only be called on a wrapper of a single node.
@@ -319,6 +338,36 @@ class ReactMountWrapper {
       const { type } = instance;
       return type.displayName || type.name || type;
     });
+  }
+
+  /**
+   * Returns a wrapper around all of the parents/ancestors of the wrapper. Does not include the node
+   * in the current wrapper.
+   *
+   * NOTE: can only be called on a wrapper of a single node.
+   *
+   * @param {String|Function} [selector]
+   * @returns {ReactWrapper}
+   */
+  parents(selector) {
+    const parentsOfInstance = (instance, parents = []) => {
+      const { parent } = instance;
+      if (parent && parent.instance === this.rootRef) {
+        return parents;
+      }
+      return parentsOfInstance(parent, [...parents, parent]);
+    };
+    const allParents = this.wrap(this.single('parents', instance => parentsOfInstance(instance)));
+    return selector ? allParents.filter(selector) : allParents;
+  }
+
+  /**
+   * Returns a wrapper around the immediate parent of the current node.
+   *
+   * @returns {ReactWrapper}
+   */
+  parent() {
+    return this.wrap(this.instances.map(instance => instance.parent));
   }
 
   /**

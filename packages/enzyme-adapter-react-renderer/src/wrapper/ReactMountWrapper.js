@@ -44,6 +44,17 @@ function filterWhereUnwrapped(instances, predicate) {
   return compact(instances.filter(predicate));
 }
 
+/**
+ * Given a React element, return the root ReactTestInstance
+ */
+function elementToInstance(element) {
+  const adapter = new ReactTestRendererAdapter();
+  const renderer = adapter.createMountRenderer({});
+  const componentRef = renderer.render(element);
+  return new ReactTestInstance(componentRef._reactInternalFiber);
+}
+
+
 class ReactMountWrapper {
   constructor(instances, rootRef, rootElement, renderer) {
 
@@ -109,10 +120,7 @@ class ReactMountWrapper {
    * @returns {Boolean}
    */
   contains(nodeOrNodes) {
-    const adapter = new ReactTestRendererAdapter();
-    const renderer = adapter.createMountRenderer({});
-    const componentRef = renderer.render(nodeOrNodes);
-    const argInstance = new ReactTestInstance(componentRef._reactInternalFiber);
+    const argInstance = elementToInstance(nodeOrNodes);
     const predicate = Array.isArray(nodeOrNodes)
       ? other => containsChildrenSubArray(
         nodeEqual,
@@ -121,6 +129,76 @@ class ReactMountWrapper {
       )
       : other => nodeEqual(argInstance.children[0], other);
 
+    return findWhereUnwrapped(this.instances, predicate).length > 0;
+  }
+
+  /**
+   * Whether or not all the given react elements exists in the current render tree.
+   * It will determine if one of the wrappers element "looks like" the expected
+   * element by checking if all props of the expected element are present
+   * on the wrappers element and equals to each other.
+   *
+   * Example:
+   * ```
+   * const wrapper = mount(<MyComponent />);
+   * expect(wrapper.containsAllMatchingElements([
+   *   <div>Hello</div>,
+   *   <div>Goodbye</div>,
+   * ])).to.equal(true);
+   * ```
+   *
+   * @param {Array<ReactElement>} nodes
+   * @returns {Boolean}
+   */
+  containsAllMatchingElements(nodes) {
+    if (!Array.isArray(nodes)) {
+      throw new TypeError('nodes should be an Array');
+    }
+
+    return nodes.every(node => this.containsMatchingElement(node));
+  }
+
+  /**
+   * Whether or not one of the given react elements exists in the current render tree.
+   * It will determine if one of the wrappers element "looks like" the expected
+   * element by checking if all props of the expected element are present
+   * on the wrappers element and equals to each other.
+   *
+   * Example:
+   * ```
+   * const wrapper = mount(<MyComponent />);
+   * expect(wrapper.containsAnyMatchingElements([
+   *   <div>Hello</div>,
+   *   <div>Goodbye</div>,
+   * ])).to.equal(true);
+   * ```
+   *
+   * @param {Array<ReactElement>} nodes
+   * @returns {Boolean}
+   */
+  containsAnyMatchingElements(nodes) {
+    return Array.isArray(nodes) && nodes.some(node => this.containsMatchingElement(node));
+  }
+
+  /**
+   * Whether or not a given react element exists in the current render tree.
+   * It will determine if one of the wrappers element "looks like" the expected
+   * element by checking if all props of the expected element are present
+   * on the wrappers element and equals to each other.
+   *
+   * Example:
+   * ```
+   * // MyComponent outputs <div><div class="foo">Hello</div></div>
+   * const wrapper = mount(<MyComponent />);
+   * expect(wrapper.containsMatchingElement(<div>Hello</div>)).to.equal(true);
+   * ```
+   *
+   * @param {ReactElement} node
+   * @returns {Boolean}
+   */
+  containsMatchingElement(node) {
+    const argInstance = elementToInstance(node);
+    const predicate = other => nodeMatches(argInstance.children[0], other, (a, b) => a <= b);
     return findWhereUnwrapped(this.instances, predicate).length > 0;
   }
 
@@ -304,6 +382,21 @@ class ReactMountWrapper {
   }
 
   /**
+   * Returns the outer most DOMComponent of the current wrapper.
+   *
+   * NOTE: can only be called on a wrapper of a single node.
+   *
+   * @returns {DOMComponent}
+   */
+  getDOMNode() {
+    return this.single('getDOMNode', (instance) => {
+      const instanceWithDOM = instance.instance ||
+        instance.find(result => result.instance).instance;
+      return ReactDOM.findDOMNode(instanceWithDOM);
+    });
+  }
+
+  /**
    * Returns the wrapped ReactElement.
    *
    * @return {ReactElement}
@@ -470,10 +563,7 @@ class ReactMountWrapper {
    */
   matchesElement(node) {
     return this.single('matchesElement', (instance) => {
-      const adapter = new ReactTestRendererAdapter();
-      const renderer = adapter.createMountRenderer({});
-      const componentRef = renderer.render(node);
-      const argInstance = new ReactTestInstance(componentRef._reactInternalFiber);
+      const argInstance = elementToInstance(node);
       return nodeMatches(argInstance.children[0], instance, (a, b) => a <= b);
     });
   }
@@ -868,6 +958,28 @@ class ReactMountWrapper {
   wrap(instances) {
     return new ReactMountWrapper(instances, this.rootRef, this.rootNode, this.renderer);
   }
+}
+
+const ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
+if (ITERATOR_SYMBOL) {
+  Object.defineProperty(ReactMountWrapper.prototype, ITERATOR_SYMBOL, {
+    configurable: true,
+    value: function iterator() {
+      const iter = this.instances[ITERATOR_SYMBOL]();
+      return {
+        next() {
+          const next = iter.next();
+          if (next.done) {
+            return { done: true };
+          }
+          return {
+            done: false,
+            value: next.value,
+          };
+        },
+      };
+    },
+  });
 }
 
 const createWrapper = (rootElement, passedOptions = {}) => {

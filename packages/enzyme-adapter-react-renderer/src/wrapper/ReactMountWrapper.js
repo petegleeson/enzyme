@@ -822,7 +822,7 @@ class ReactMountWrapper {
    */
   simulate(event, mock = {}) {
     this.single('simulate', (instance) => {
-      this.renderer.simulateEvent(instance.instance, event, mock);
+      this.renderer.simulateEvent(instance, event, mock);
     });
     return this;
   }

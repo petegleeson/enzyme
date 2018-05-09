@@ -35,7 +35,8 @@ class ReactTestRendererAdapter extends EnzymeAdapter {
         if (!eventFn) {
           throw new TypeError(`ReactWrapper::simulate() event '${event}' does not exist`);
         }
-        eventFn(ReactDOM.findDOMNode(node), mock);
+        const instanceWithDOM = node.instance || node.find(inst => inst.instance).instance;
+        eventFn(ReactDOM.findDOMNode(instanceWithDOM), mock);
       },
       unmount() {
         ReactDOM.unmountComponentAtNode(domNode);

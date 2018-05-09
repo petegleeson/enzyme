@@ -617,6 +617,18 @@ class ReactMountWrapper {
   }
 
   /**
+   * Returns a new wrapper instance with only the nodes of the current wrapper that did not match
+   * the provided selector. Essentially the inverse of `filter`.
+   *
+   * @param {String|Function} selector
+   * @returns {ReactWrapper}
+   */
+  not(selector) {
+    const predicate = buildPredicate(selector);
+    return filterWhereUnwrapped(this.instances, n => !predicate(n));
+  }
+
+  /**
    * Returns a wrapper around all of the parents/ancestors of the wrapper. Does not include the node
    * in the current wrapper.
    *

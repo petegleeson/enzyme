@@ -88,6 +88,15 @@ class ReactMountWrapper {
   }
 
   /**
+   *
+   * @param {String|Function} selector
+   * @returns {ReactWrapper}
+   */
+  closest(selector) {
+    return this.is(selector) ? this : this.parents().filter(selector).first();
+  }
+
+  /**
    * Whether or not a given react element exists in the mount render tree.
    *
    * Example:
@@ -116,18 +125,6 @@ class ReactMountWrapper {
   }
 
   /**
-   * Returns an HTML-like string of the shallow render for debugging purposes.
-   *
-   * @param {Object} [options] - Property bag of additional options.
-   * @param {boolean} [options.ignoreProps] - if true, props are omitted from the string.
-   * @param {boolean} [options.verbose] - if true, arrays and objects to be verbosely printed.
-   * @returns {String}
-   */
-  debug(options = {}) {
-    return debugNodes(this.instances, options);
-  }
-
-  /**
    * Returns the context hash for the root node of the wrapper.
    * Optionally pass in a prop name and it will return just that value.
    *
@@ -149,6 +146,68 @@ class ReactMountWrapper {
       return _context[name];
     }
     return _context;
+  }
+
+  /**
+   * Returns an HTML-like string of the shallow render for debugging purposes.
+   *
+   * @param {Object} [options] - Property bag of additional options.
+   * @param {boolean} [options.ignoreProps] - if true, props are omitted from the string.
+   * @param {boolean} [options.verbose] - if true, arrays and objects to be verbosely printed.
+   * @returns {String}
+   */
+  debug(options = {}) {
+    return debugNodes(this.instances, options);
+  }
+
+  /**
+   * Detaches the react tree from the DOM. Runs `ReactDOM.unmountComponentAtNode()` under the hood.
+   *
+   * This method will most commonly be used as a "cleanup" method if you decide to use the
+   * `attachTo` option in `mount(node, options)`.
+   *
+   * The method is intentionally not "fluent" (in that it doesn't return `this`) because you should
+   * not be doing anything with this wrapper after this method is called.
+   */
+  detach() {
+    if (!this.isRoot()) {
+      throw new Error('ReactWrapper::detach() can only be called on the root');
+    }
+    // TODO work out how to check this
+    // if (!this[OPTIONS].attachTo) {
+    //   throw new Error('ReactWrapper::detach() can only be called on when the `attachTo` option was passed into `mount()`.');
+    // }
+    this.renderer.unmount();
+  }
+
+  /**
+   * Returns whether or not all of the nodes in the wrapper match the provided selector.
+   *
+   * @param {Function|String} selector
+   * @returns {Boolean}
+   */
+  every(selector) {
+    const predicate = buildPredicate(selector);
+    return this.instances.every(predicate);
+  }
+
+  /**
+   * Returns whether or not any of the nodes in the wrapper pass the provided predicate function.
+   *
+   * @param {Function} predicate
+   * @returns {Boolean}
+   */
+  everyWhere(predicate) {
+    return this.instances.every((n, i) => predicate.call(this, this.wrap([n]), i));
+  }
+
+  /**
+   * Returns true if the current wrapper has nodes. False otherwise.
+   *
+   * @returns {boolean}
+   */
+  exists() {
+    return this.length > 0;
   }
 
   /**
@@ -215,11 +274,54 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   flatMap(fn) {
-    const nodes = this.instances.map((n, i) => fn.call(this, this.wrap(n), i));
+    const nodes = this.instances.map((n, i) => fn.call(this, this.wrap([n]), i));
     const flattened = flatten(nodes, true);
     const uniques = unique(flattened);
     const compacted = compact(uniques);
     return this.wrap(compacted);
+  }
+
+  /**
+   * Iterates through each node of the current wrapper and executes the provided function with a
+   * wrapper around the corresponding node passed in as the first argument.
+   *
+   * @param {Function} fn
+   * @returns {ReactWrapper}
+   */
+  forEach(fn) {
+    this.instances.forEach((n, i) => fn.call(this, this.wrap([n]), i));
+    return this;
+  }
+
+  /**
+   * Returns the node at a given index of the current wrapper.
+   *
+   * @param {Number} index
+   * @returns {ReactElement}
+   */
+  get(index) {
+    return this.getElements()[index];
+  }
+
+  /**
+   * Returns the wrapped ReactElement.
+   *
+   * @return {ReactElement}
+   */
+  getElement() {
+    if (this.length !== 1) {
+      throw new Error('ReactWrapper::getElement() can only be called when wrapping one node');
+    }
+    return this.instances[0];
+  }
+
+  /**
+   * Returns the wrapped ReactElements.
+   *
+   * @return {Array<ReactElement>}
+   */
+  getElements() {
+    return this.instances;
   }
 
   /**
@@ -289,6 +391,17 @@ class ReactMountWrapper {
   }
 
   /**
+   * Delegates to exists()
+   *
+   * @returns {boolean}
+   */
+  isEmpty() {
+    // eslint-disable-next-line no-console
+    console.warn('Enzyme::Deprecated method isEmpty() called, use exists() instead.');
+    return !this.exists();
+  }
+
+  /**
    * Returns true if the component rendered nothing, i.e., null or false.
    *
    * @returns {boolean}
@@ -297,10 +410,27 @@ class ReactMountWrapper {
     return this.html() === null;
   }
 
+  /**
+   * Returns true if this wrapper is the root wrapper
+   *
+   * @returns {boolean}
+   */
   isRoot() {
     const [first] = this.instances;
     return first && first.parent.instance === this.rootRef;
   }
+
+  /**
+   * Returns the key assigned to the current node.
+   *
+   * @returns {String}
+   */
+  key() {
+    // TODO fix reference to _fiber
+    return this.single('key', instance =>
+      (instance._fiber.key === undefined ? null : instance._fiber.key));
+  }
+
 
   /**
    * Returns a wrapper around the last node of the current wrapper.
@@ -309,6 +439,17 @@ class ReactMountWrapper {
    */
   last() {
     return this.at(this.length - 1);
+  }
+
+  /**
+   * Maps the current array of nodes to another array. Each node is passed in as a `ReactWrapper`
+   * to the map function.
+   *
+   * @param {Function} fn
+   * @returns {Array}
+   */
+  map(fn) {
+    return this.instances.map((n, i) => fn.call(this, this.wrap([n]), i));
   }
 
   /**
@@ -389,6 +530,68 @@ class ReactMountWrapper {
    */
   props() {
     return this.single('props', instance => instance.props);
+  }
+
+  /**
+   * Reduces the current array of nodes to another array.
+   * Each node is passed in as a `ShallowWrapper` to the reducer function.
+   *
+   * @param {Function} fn - the reducer function
+   * @param {*} initialValue - the initial value
+   * @returns {*}
+   */
+  reduce(fn, initialValue = undefined) {
+    if (arguments.length > 1) {
+      return this.instances.reduce(
+        (accum, n, i) => fn.call(this, accum, this.wrap([n]), i),
+        initialValue,
+      );
+    }
+    return this.instances.reduce((accum, n, i) => fn.call(
+      this,
+      i === 1 ? this.wrap(accum) : accum,
+      this.wrap([n]),
+      i,
+    ));
+  }
+
+  /**
+   * Reduces the current array of nodes to another array, from right to left. Each node is passed
+   * in as a `ShallowWrapper` to the reducer function.
+   *
+   * @param {Function} fn - the reducer function
+   * @param {*} initialValue - the initial value
+   * @returns {*}
+   */
+  reduceRight(fn, initialValue = undefined) {
+    if (arguments.length > 1) {
+      return this.instances.reduceRight(
+        (accum, n, i) => fn.call(this, accum, this.wrap([n]), i),
+        initialValue,
+      );
+    }
+    return this.instances.reduceRight((accum, n, i) => fn.call(
+      this,
+      i === 1 ? this.wrap(accum) : accum,
+      this.wrap([n]),
+      i,
+    ));
+  }
+
+  /**
+   * If the root component contained a ref, you can access it here
+   * and get a wrapper around it.
+   *
+   * NOTE: can only be called on a wrapper instance that is also the root instance.
+   *
+   * @param {String} refname
+   * @returns {ReactWrapper}
+   */
+  ref(refname) {
+    if (!this.isRoot()) {
+      throw new Error('ReactWrapper::ref(refname) can only be called on the root');
+    }
+    return this.instance().refs[refname];
   }
 
   /**
@@ -509,6 +712,42 @@ class ReactMountWrapper {
   }
 
   /**
+   * Returns a new wrapper with a subset of the nodes of the original wrapper, according to the
+   * rules of `Array#slice`.
+   *
+   * @param {Number} begin
+   * @param {Number} end
+   * @returns {ShallowWrapper}
+   */
+  slice(begin, end) {
+    return this.wrap(this.instances.slice(begin, end));
+  }
+
+  /**
+   * Returns whether or not any of the nodes in the wrapper match the provided selector.
+   *
+   * @param {Function|String} selector
+   * @returns {Boolean}
+   */
+  some(selector) {
+    if (this.isRoot()) {
+      throw new Error('ReactWrapper::some() can not be called on the root');
+    }
+    const predicate = buildPredicate(selector);
+    return this.instances.some(predicate);
+  }
+
+  /**
+   * Returns whether or not any of the nodes in the wrapper pass the provided predicate function.
+   *
+   * @param {Function} predicate
+   * @returns {Boolean}
+   */
+  someWhere(predicate) {
+    return this.instances.some((n, i) => predicate.call(this, this.wrap([n]), i));
+  }
+
+  /**
    * Returns the state hash for the root node of the wrapper. Optionally pass in a prop name and it
    * will return just that value.
    *
@@ -526,6 +765,17 @@ class ReactMountWrapper {
       return _state[name];
     }
     return _state;
+  }
+
+  /**
+   * Invokes intercepter and returns itself. intercepter is called with itself.
+   * This is helpful when debugging nodes in method chains.
+   * @param fn
+   * @returns {ReactWrapper}
+   */
+  tap(intercepter) {
+    intercepter(this);
+    return this;
   }
 
   /**

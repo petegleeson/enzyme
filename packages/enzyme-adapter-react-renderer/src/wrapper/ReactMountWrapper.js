@@ -8,7 +8,7 @@ import ReactDOMServer from 'react-dom/server';
 import ReactTestRendererAdapter from '../adapter/ReactTestRendererAdapter';
 import ReactTestInstance from './ReactTestInstance';
 
-import { containsChildrenSubArray, nodeEqual, treeFilter } from './contains';
+import { containsChildrenSubArray, nodeEqual, treeFilter, nodeMatches } from './contains';
 import { debugNodes } from './debug';
 import { reduceTreesBySelector, buildPredicate, hasClassName } from './selectors';
 
@@ -452,6 +452,31 @@ class ReactMountWrapper {
     return this.instances.map((n, i) => fn.call(this, this.wrap([n]), i));
   }
 
+  /**
+   * Whether or not a given react element matches the current render tree.
+   * It will determine if the wrapper root node "looks like" the expected
+   * element by checking if all props of the expected element are present
+   * on the wrapper root node and equals to each other.
+   *
+   * Example:
+   * ```
+   * // MyComponent outputs <div class="foo">Hello</div>
+   * const wrapper = mount(<MyComponent />);
+   * expect(wrapper.matchesElement(<div>Hello</div>)).to.equal(true);
+   * ```
+   *
+   * @param {ReactElement} node
+   * @returns {Boolean}
+   */
+  matchesElement(node) {
+    return this.single('matchesElement', (instance) => {
+      const adapter = new ReactTestRendererAdapter();
+      const renderer = adapter.createMountRenderer({});
+      const componentRef = renderer.render(node);
+      const argInstance = new ReactTestInstance(componentRef._reactInternalFiber);
+      return nodeMatches(argInstance.children[0], instance, (a, b) => a <= b);
+    });
+  }
   /**
    * A method that re-mounts the component, if it is not currently mounted.
    * This can be used to simulate a component going through

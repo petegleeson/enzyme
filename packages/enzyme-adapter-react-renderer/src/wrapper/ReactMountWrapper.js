@@ -426,7 +426,7 @@ class ReactMountWrapper {
     if (this.length !== 1) {
       throw new Error('ReactWrapper::getNode() can only be called when wrapping one node');
     }
-    return this.instances[0]
+    return this.instances[0];
   }
 
   /**

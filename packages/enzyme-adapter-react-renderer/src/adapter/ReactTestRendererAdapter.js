@@ -4,7 +4,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-dom/test-utils';
 
-class ReactTestRendererAdapter extends EnzymeAdapter {
+export function createWrappedElement(el, context, options) {
+  const ReactWrapperComponent = createMountWrapper(el, options);
+  return React.createElement(ReactWrapperComponent, {
+    Component: el.type,
+    props: el.props,
+    context,
+  });
+}
+
+export class ReactTestRendererAdapter extends EnzymeAdapter {
   constructor() {
     super();
   }
@@ -14,12 +23,7 @@ class ReactTestRendererAdapter extends EnzymeAdapter {
     return {
       render(el, context, callback) {
         if (instance === null) {
-          const ReactWrapperComponent = createMountWrapper(el, options);
-          const wrappedEl = React.createElement(ReactWrapperComponent, {
-            Component: el.type,
-            props: el.props,
-            context,
-          });
+          const wrappedEl = createWrappedElement(el, context, options);
           instance = ReactDOM.render(wrappedEl, domNode);
           if (typeof callback === 'function') {
             callback();
@@ -53,5 +57,3 @@ class ReactTestRendererAdapter extends EnzymeAdapter {
     }
   }
 }
-
-module.exports = ReactTestRendererAdapter;

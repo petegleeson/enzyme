@@ -5,7 +5,8 @@ import flatten from 'lodash/flatten';
 import unique from 'lodash/uniq';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
-import ReactTestRendererAdapter from '../adapter/ReactTestRendererAdapter';
+import ReactTestRenderer from 'react-test-renderer';
+import { ReactTestRendererAdapter, createWrappedElement } from '../adapter/ReactTestRendererAdapter';
 import ReactTestInstance from './ReactTestInstance';
 
 import { containsChildrenSubArray, nodeEqual, treeFilter, nodeMatches } from './contains';
@@ -48,10 +49,8 @@ function filterWhereUnwrapped(instances, predicate) {
  * Given a React element, return the root ReactTestInstance
  */
 function elementToInstance(element) {
-  const adapter = new ReactTestRendererAdapter();
-  const renderer = adapter.createMountRenderer({});
-  const componentRef = renderer.render(element);
-  return new ReactTestInstance(componentRef._reactInternalFiber);
+  const wrappedElement = createWrappedElement(element, null, {});
+  return ReactTestRenderer.create(wrappedElement).root;
 }
 
 
@@ -698,7 +697,7 @@ class ReactMountWrapper {
     }
     return this.instances.reduce((accum, n, i) => fn.call(
       this,
-      i === 1 ? this.wrap(accum) : accum,
+      i === 1 ? this.wrap([accum]) : accum,
       this.wrap([n]),
       i,
     ));
@@ -721,7 +720,7 @@ class ReactMountWrapper {
     }
     return this.instances.reduceRight((accum, n, i) => fn.call(
       this,
-      i === 1 ? this.wrap(accum) : accum,
+      i === 1 ? this.wrap([accum]) : accum,
       this.wrap([n]),
       i,
     ));

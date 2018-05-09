@@ -308,7 +308,9 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   filterWhere(predicate) {
-    return this.wrap(filterWhereUnwrapped(this.instances, predicate));
+    return this.wrap(this.instances
+      .map(instance => this.wrap([instance]))
+      .filter(wrapper => predicate(wrapper)));
   }
 
   /**
@@ -460,7 +462,8 @@ class ReactMountWrapper {
    * (actually rendered HTML elements) ignoring the React nodes.
    */
   hostNodes() {
-    return this.filterWhere(n => typeof n.type === 'string');
+    return this.wrap(this.instances.filter(instance =>
+      typeof instance.type === 'string'));
   }
 
   /**

@@ -1015,7 +1015,7 @@ if (ITERATOR_SYMBOL) {
   });
 }
 
-const createWrapper = (rootElement, passedOptions = {}) => {
+const mountWrapper = (rootElement, passedOptions = {}) => {
   const adapter = new ReactTestRendererAdapter();
   const renderer = adapter.createMountRenderer(passedOptions);
   const rootRef = renderer.render(rootElement, passedOptions.context);
@@ -1023,4 +1023,4 @@ const createWrapper = (rootElement, passedOptions = {}) => {
   return new ReactMountWrapper(rootInstance.children, rootRef, rootElement, renderer);
 };
 
-module.exports = createWrapper;
+module.exports = mountWrapper;

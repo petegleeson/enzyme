@@ -8,8 +8,7 @@ import configuration from './configuration';
  * @returns {ReactWrapper}
  */
 export default function mount(node, options) {
-  const { wrapper } = configuration.get();
-  // the API for creating built-in wrapper vs a custom wrapper
-  // should be standardised
-  return wrapper ? wrapper(node, options) : new ReactWrapper(node, null, options);
+  const { mountWrapper } = configuration.get();
+  // should the API for creating built-in wrapper vs a custom wrapper be standardised?
+  return mountWrapper ? mountWrapper(node, options) : new ReactWrapper(node, null, options);
 }

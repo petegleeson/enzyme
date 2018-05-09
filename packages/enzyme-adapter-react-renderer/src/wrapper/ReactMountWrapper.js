@@ -57,7 +57,6 @@ function elementToInstance(element) {
 
 class ReactMountWrapper {
   constructor(instances, rootRef, rootElement, renderer) {
-
     // private api
     this.instances = instances;
     this.rootRef = rootRef;

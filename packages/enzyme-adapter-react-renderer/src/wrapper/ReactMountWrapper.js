@@ -418,6 +418,26 @@ class ReactMountWrapper {
   }
 
   /**
+   * Returns the wrapped component.
+   *
+   * @return {ReactComponent}
+   */
+  getNodeInternal() {
+    if (this.length !== 1) {
+      throw new Error('ReactWrapper::getNode() can only be called when wrapping one node');
+    }
+    return this.instances[0]
+  }
+
+  /**
+   * Returns the the wrapped components.
+   *
+   * @return {Array<ReactComponent>}
+   */
+  getNodesInternal() {
+    return this.instances;
+  }
+  /**
    * Returns whether or not the current root node has the given class name or not.
    *
    * NOTE: can only be called on a wrapper of a single node.

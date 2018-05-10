@@ -1,5 +1,5 @@
 {
-  "name": "enzyme-adapter-react-renderer",
+  "name": "enzyme-mount-wrapper",
   "version": "0.0.1",
   "description": "JavaScript Testing utilities for React",
   "homepage": "http://airbnb.io/enzyme/",

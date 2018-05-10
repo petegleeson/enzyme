@@ -1375,6 +1375,24 @@ describeWithDOM('mount', () => {
     });
   });
 
+  describe('.update()', () => {
+    it('should call componentDidUpdate()', () => {
+      const didUpdate = sinon.spy();
+      class Foo extends React.Component {
+        componentDidUpdate() {
+          didUpdate();
+        }
+        render() {
+          return (
+            <div>{this.props.children}</div>
+          );
+        }
+      }
+      mount(<Foo>hello</Foo>).update();
+      expect(didUpdate.callCount).to.equal(1);
+    });
+  });
+
   describe('.mount()', () => {
     it('should call componentWillUnmount()', () => {
       const willMount = sinon.spy();

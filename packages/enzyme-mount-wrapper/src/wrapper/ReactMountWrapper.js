@@ -968,6 +968,21 @@ class ReactMountWrapper {
   }
 
   /**
+   * Forces a re-render. Useful to run before checking the render output if something external
+   * may be updating the state of the component somewhere.
+   *
+   * NOTE: can only be called on a wrapper instance that is also the root instance.
+   *
+   * @returns {ReactWrapper}
+   */
+  update() {
+    if (!this.isRoot()) {
+      throw new Error('ReactWrapper::update() can only be called on the root');
+    }
+    return this.rootRef.forceUpdate();
+  }
+
+  /**
    * A method that unmounts the component. This can be used to simulate a component going through
    * and unmount/mount lifecycle.
    *

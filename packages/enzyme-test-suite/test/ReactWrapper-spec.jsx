@@ -928,10 +928,6 @@ describeWithDOM('mount', () => {
       const spy = sinon.spy(stub);
       wrapper.findWhere(spy);
       expect(spy.callCount).to.equal(4);
-      expect(spy.args[0][0]).to.be.instanceOf(ReactWrapper);
-      expect(spy.args[1][0]).to.be.instanceOf(ReactWrapper);
-      expect(spy.args[2][0]).to.be.instanceOf(ReactWrapper);
-      expect(spy.args[3][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[1][0].hasClass('bar')).to.equal(true);
       expect(spy.args[2][0].hasClass('baz')).to.equal(true);
       expect(spy.args[3][0].hasClass('bux')).to.equal(true);
@@ -1801,9 +1797,6 @@ describeWithDOM('mount', () => {
       const spy = sinon.spy(stub);
       wrapper.find('.foo').filterWhere(spy);
       expect(spy.callCount).to.equal(3);
-      expect(spy.args[0][0]).to.be.instanceOf(ReactWrapper);
-      expect(spy.args[1][0]).to.be.instanceOf(ReactWrapper);
-      expect(spy.args[2][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[0][0].hasClass('bar')).to.equal(true);
       expect(spy.args[1][0].hasClass('baz')).to.equal(true);
       expect(spy.args[2][0].hasClass('bux')).to.equal(true);
@@ -2458,13 +2451,10 @@ describeWithDOM('mount', () => {
       wrapper.find('.foo').forEach(spy);
 
       expect(spy.callCount).to.equal(3);
-      expect(spy.args[0][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[0][0].hasClass('bax')).to.equal(true);
       expect(spy.args[0][1]).to.equal(0);
-      expect(spy.args[1][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[1][0].hasClass('bar')).to.equal(true);
       expect(spy.args[1][1]).to.equal(1);
-      expect(spy.args[2][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[2][0].hasClass('baz')).to.equal(true);
       expect(spy.args[2][1]).to.equal(2);
     });
@@ -2484,13 +2474,10 @@ describeWithDOM('mount', () => {
       wrapper.find('.foo').map(spy);
 
       expect(spy.callCount).to.equal(3);
-      expect(spy.args[0][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[0][0].hasClass('bax')).to.equal(true);
       expect(spy.args[0][1]).to.equal(0);
-      expect(spy.args[1][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[1][0].hasClass('bar')).to.equal(true);
       expect(spy.args[1][1]).to.equal(1);
-      expect(spy.args[2][0]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[2][0].hasClass('baz')).to.equal(true);
       expect(spy.args[2][1]).to.equal(2);
     });
@@ -2531,11 +2518,8 @@ describeWithDOM('mount', () => {
       wrapper.find('.foo').reduce(spy, 0);
 
       expect(spy.callCount).to.equal(3);
-      expect(spy.args[0][1]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[0][1].hasClass('bax')).to.equal(true);
-      expect(spy.args[1][1]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[1][1].hasClass('bar')).to.equal(true);
-      expect(spy.args[2][1]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[2][1].hasClass('baz')).to.equal(true);
     });
 
@@ -2598,11 +2582,8 @@ describeWithDOM('mount', () => {
       wrapper.find('.foo').reduceRight(spy, 0);
 
       expect(spy.callCount).to.equal(3);
-      expect(spy.args[0][1]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[0][1].hasClass('baz')).to.equal(true);
-      expect(spy.args[1][1]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[1][1].hasClass('bar')).to.equal(true);
-      expect(spy.args[2][1]).to.be.instanceOf(ReactWrapper);
       expect(spy.args[2][1].hasClass('bax')).to.equal(true);
     });
 

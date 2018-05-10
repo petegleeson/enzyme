@@ -306,9 +306,11 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   filterWhere(predicate) {
+    // TODO decide whether predicates get passed ReactMountWrapper or ReactTestInstance
     return this.wrap(this.instances
       .map(instance => this.wrap([instance]))
-      .filter(wrapper => predicate(wrapper)));
+      .filter(wrapper => predicate(wrapper))
+      .reduce((existing, current) => [...existing, ...current.getNodesInternal()], []));
   }
 
   /**

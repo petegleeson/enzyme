@@ -1410,7 +1410,11 @@ describeWithDOM('mount', () => {
     });
 
     it('should return wrapper', () => {
-      const Greeting = () => 'hi';
+      class Greeting extends React.Component {
+        render() {
+          return 'hi';
+        }
+      }
       const wrapper = mount(<Greeting />);
       const updatedWrapper = wrapper.update();
       expect(updatedWrapper).to.equal(wrapper);

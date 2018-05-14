@@ -3019,6 +3019,38 @@ describeWithDOM('mount', () => {
       expect(wrapper.find(Foo).html()).to.equal('<div class="in-foo"></div>');
     });
 
+    it('should return html representing the current state', () => {
+      class UserProfile extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = { isLoading: true };
+        }
+        componentDidMount() {
+          Promise.resolve()
+            .then(() => this.setState({ isLoading: false }));
+        }
+        render() {
+          const { isLoading } = this.state;
+          return isLoading ? 'Loading' : null;
+        }
+      }
+      const wrapper = mount(<UserProfile />);
+      return Promise.resolve()
+        .then(() => {
+          expect(wrapper.html()).to.equal(null);
+        });
+    });
+
+    it('should return html of class component rendering a string', () => {
+      class Greeting extends React.Component {
+        render() {
+          return 'Hello';
+        }
+      }
+      const wrapper = mount(<Greeting />);
+      expect(wrapper.html()).to.equal('Hello');
+    });
+
     describeIf(!REACT013, 'stateless function components', () => {
       it('should render out nested composite components', () => {
         const Foo = () => <div className="in-foo" />;

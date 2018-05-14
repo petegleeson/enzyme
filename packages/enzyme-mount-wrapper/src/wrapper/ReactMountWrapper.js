@@ -62,6 +62,12 @@ function elementToInstance(element) {
 
 class ReactMountWrapper {
   constructor(instances, rootRef, rootElement, renderer) {
+    // TODO remove this
+    instances.forEach((instance) => {
+      if (!(instance instanceof ReactTestInstance)) {
+        throw new Error(`attempted to create wrapper with instance ${instance}`);
+      }
+    });
     // private api
     this.instances = instances;
     this.rootRef = rootRef;

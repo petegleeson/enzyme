@@ -2911,6 +2911,14 @@ describeWithDOM('mount', () => {
       expect(wrapper.find('.bar').at(2).hasClass('bux')).to.equal(true);
       expect(wrapper.find('.bar').at(3).hasClass('baz')).to.equal(true);
     });
+    it('still gets a wrapper with an invalid index', () => {
+      const wrapper = mount((
+        <div>
+          <div className="bar foo" />
+        </div>
+      ));
+      expect(wrapper.at(1).length).to.equal(0);
+    });
   });
 
   describe('.get(index)', () => {

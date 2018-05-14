@@ -72,7 +72,8 @@ class ReactMountWrapper {
    * @returns {ReactWrapper}
    */
   at(index) {
-    return this.wrap([this.instances[index]]);
+    const results = this.instances[index] ? [this.instances[index]] : [];
+    return this.wrap(results);
   }
 
   /**

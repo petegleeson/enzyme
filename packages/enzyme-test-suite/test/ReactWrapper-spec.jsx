@@ -1391,6 +1391,30 @@ describeWithDOM('mount', () => {
       mount(<Foo>hello</Foo>).update();
       expect(didUpdate.callCount).to.equal(1);
     });
+
+    it('should handle impure renders', () => {
+      class ImpureRender extends React.Component {
+        constructor(props) {
+          super(props);
+          this.toggle = false;
+        }
+        render() {
+          this.toggle = !this.toggle;
+          return this.toggle ? <div /> : <span />;
+        }
+      }
+      const wrapper = mount(<ImpureRender />);
+      expect(wrapper.find('div')).to.have.lengthOf(1);
+      wrapper.update();
+      expect(wrapper.find('span')).to.have.lengthOf(1);
+    });
+
+    it('should return wrapper', () => {
+      const Greeting = () => 'hi';
+      const wrapper = mount(<Greeting />);
+      const updatedWrapper = wrapper.update();
+      expect(updatedWrapper).to.equal(wrapper);
+    });
   });
 
   describe('.mount()', () => {

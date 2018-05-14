@@ -979,7 +979,8 @@ class ReactMountWrapper {
     if (!this.isRoot()) {
       throw new Error('ReactWrapper::update() can only be called on the root');
     }
-    return this.rootRef.forceUpdate();
+    this.rootRef.forceUpdate();
+    return this;
   }
 
   /**

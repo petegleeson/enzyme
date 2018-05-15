@@ -3920,4 +3920,32 @@ describeWithDOM('mount', () => {
       });
     });
   });
+
+  describe('json()', () => {
+    it('converts component tree to nested object', () => {
+      class Foo extends React.Component {
+        render() {
+          return (
+            <div id="1">{this.props.children}</div>
+          );
+        }
+      }
+      const wrapper = mount(<Foo isLoading>hi</Foo>);
+      expect(wrapper.json()).to.deep.equal({
+        type: 'Foo',
+        props: {
+          isLoading: true,
+          children: 'hi',
+        },
+        children: [{
+          type: 'div',
+          props: {
+            id: '1',
+            children: 'hi',
+          },
+          children: null,
+        }],
+      });
+    });
+  });
 });

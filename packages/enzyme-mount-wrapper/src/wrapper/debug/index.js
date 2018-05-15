@@ -1,22 +1,15 @@
 import without from 'lodash/without';
 import escape from 'lodash/escape';
 import compact from 'lodash/compact';
-import functionName from 'function.prototype.name';
 import isString from 'is-string';
 import isNumber from 'is-number-object';
 import isCallable from 'is-callable';
 import isBoolean from 'is-boolean-object';
 import inspect from 'object-inspect';
 
-import { propsOfNode } from '../common';
+import { propsOfNode, typeName } from '../common';
 
 const booleanValue = Function.bind.call(Function.call, Boolean.prototype.valueOf);
-
-export function typeName(node) {
-  return typeof node.type === 'function'
-    ? node.type.displayName || functionName(node.type) || 'Component'
-    : node.type;
-}
 
 export function spaces(n) {
   return Array(n + 1).join(' ');
@@ -67,7 +60,6 @@ function indentChildren(childrenStrs, indentLength) {
 export function debugNode(node, indentLength = 2, options = {}) {
   if (typeof node === 'string' || typeof node === 'number') return escape(node);
   if (!node) return '';
-
 
   const children = node.children.length > 0 ? node.children : [node.props.children];
   const childrenStrs = compact(children.map(n => debugNode(n, indentLength, options)));

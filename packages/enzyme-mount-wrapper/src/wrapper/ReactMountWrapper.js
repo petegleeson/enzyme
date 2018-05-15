@@ -1,4 +1,3 @@
-import React from 'react';
 import cheerio from 'cheerio';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
@@ -10,6 +9,7 @@ import ReactTestInstance from './ReactTestInstance';
 
 import { containsChildrenSubArray, nodeEqual, treeFilter, nodeMatches } from './contains';
 import { debugNodes } from './debug';
+import { toJSON } from './json';
 import { reduceTreesBySelector, buildPredicate, hasClassName } from './selectors';
 
 const noop = () => {};
@@ -558,6 +558,10 @@ class ReactMountWrapper {
   isRoot() {
     const [first] = this.instances;
     return first && first.parent.instance === this.rootRef;
+  }
+
+  json() {
+    return this.single('json', instance => toJSON(instance));
   }
 
   /**

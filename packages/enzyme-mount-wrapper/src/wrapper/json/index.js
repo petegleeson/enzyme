@@ -8,6 +8,17 @@ const reactTestJson = obj =>
     value: Symbol.for('react.test.json'),
   });
 
+// strips out children from props, adds key if it exists
+const getProps = (instance) => {
+  const { children, ...rest } = instance.props;
+  // TODO remove this React implementation detail
+  const { key } = instance._fiber;
+  return {
+    ...rest,
+    ...(key ? { key } : {}),
+  };
+};
+
 // This function converts a ReactMountWrapper into an object structure
 // that can be passed to jest's serializer for use in snapshot tests
 export const toJSON = (instance) => {
@@ -15,14 +26,14 @@ export const toJSON = (instance) => {
   if (children.length === 0) {
     return reactTestJson({
       type: typeName(instance),
-      props,
+      props: getProps(instance),
       children: null,
     });
   }
   const jsonChildren = children.map(toJSON);
   return reactTestJson({
     type: typeName(instance),
-    props,
+    props: getProps(instance),
     children: jsonChildren,
   });
 };

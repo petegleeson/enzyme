@@ -3935,13 +3935,36 @@ describeWithDOM('mount', () => {
         type: 'Foo',
         props: {
           isLoading: true,
-          children: 'hi',
         },
         children: [{
           type: 'div',
           props: {
             id: '1',
-            children: 'hi',
+          },
+          children: null,
+        }],
+      });
+    });
+
+    it('adds key to props', () => {
+      class Foo extends React.Component {
+        render() {
+          return (
+            <div key="foo-div" id="1">{this.props.children}</div>
+          );
+        }
+      }
+      const wrapper = mount(<Foo isLoading>hi</Foo>);
+      expect(wrapper.json()).to.deep.equal({
+        type: 'Foo',
+        props: {
+          isLoading: true,
+        },
+        children: [{
+          type: 'div',
+          props: {
+            id: '1',
+            key: 'foo-div',
           },
           children: null,
         }],

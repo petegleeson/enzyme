@@ -1059,4 +1059,7 @@ const mountWrapper = (rootElement, passedOptions = {}) => {
   return new ReactMountWrapper(rootInstance.children, rootRef, rootElement, renderer);
 };
 
-module.exports = mountWrapper;
+export default mountWrapper;
+
+export const isMountWrapper = val =>
+  !!val && (val instanceof ReactMountWrapper);

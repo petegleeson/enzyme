@@ -128,8 +128,11 @@ class ReactTestInstance {
   }
 
   get parent() {
-    const parent = this._fiber.return;
-    return parent === null || parent.tag === HostRoot ? null : wrapFiber(parent);
+    let parent = this._fiber.return;
+    while (parent && !validWrapperTypes.has(parent.tag)) {
+      parent = parent.return;
+    }
+    return parent === null ? null : wrapFiber(parent);
   }
 
   get children() {

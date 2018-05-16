@@ -2291,6 +2291,21 @@ describeWithDOM('mount', () => {
       expect(parents.at(0).hasClass('foo')).to.equal(true);
       expect(parents.at(1).hasClass('bax')).to.equal(true);
     });
+
+    describeIf(REACT16, 'with fragments', () => {
+      it('should skip fragment', () => {
+        const wrapper = mount((
+          <div>
+            <span>this is important</span>
+            {[
+              <span className="span1">child1</span>,
+              <span>child2</span>,
+            ]}
+          </div>
+        ));
+        expect(wrapper.find('.span1').parents().length).to.equal(1);
+      });
+    });
   });
 
   describe('.parent()', () => {

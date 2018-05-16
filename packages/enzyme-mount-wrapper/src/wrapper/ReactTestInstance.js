@@ -129,10 +129,13 @@ class ReactTestInstance {
 
   get parent() {
     let parent = this._fiber.return;
-    while (parent && !validWrapperTypes.has(parent.tag)) {
+    while (parent !== null) {
+      if (validWrapperTypes.has(parent.tag)) {
+        return wrapFiber(parent);
+      }
       parent = parent.return;
     }
-    return parent === null ? null : wrapFiber(parent);
+    return null;
   }
 
   get children() {
@@ -146,28 +149,12 @@ class ReactTestInstance {
     node = node.child;
     outer: while (true) {
       let descend = false;
-      switch (node.tag) {
-        case FunctionalComponent:
-        case ClassComponent:
-        case HostComponent:
-        case ForwardRef:
-          children.push(wrapFiber(node));
-          break;
-        case HostText:
-          children.push(`${node.memoizedProps}`);
-          break;
-        case Fragment:
-        case ContextProvider:
-        case ContextConsumer:
-        case Mode:
-          descend = true;
-          break;
-        default:
-          invariant(
-            false,
-            'Unsupported component type %s in test renderer. ' + 'This is probably a bug in React.',
-            node.tag,
-          );
+      if (validWrapperTypes.has(node.tag)) {
+        children.push(wrapFiber(node));
+      } else if (node.tag === HostText) {
+        children.push('' + node.memoizedProps);
+      } else {
+      descend = true;
       }
       if (descend && node.child !== null) {
         node.child.return = node;

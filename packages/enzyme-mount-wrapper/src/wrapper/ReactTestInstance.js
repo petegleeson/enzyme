@@ -152,9 +152,9 @@ class ReactTestInstance {
       if (validWrapperTypes.has(node.tag)) {
         children.push(wrapFiber(node));
       } else if (node.tag === HostText) {
-        children.push('' + node.memoizedProps);
+        children.push(`${node.memoizedProps}`);
       } else {
-      descend = true;
+        descend = true;
       }
       if (descend && node.child !== null) {
         node.child.return = node;

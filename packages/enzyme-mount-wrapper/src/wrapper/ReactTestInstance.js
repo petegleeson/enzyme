@@ -124,6 +124,12 @@ class ReactTestInstance {
   }
 
   get props() {
+    // TODO this is our own modification
+    // ForwardRef nodes when rendered by ReactDOM do not have props
+    // Using pending props is potentially bad, possible to change this in React?
+    if (this._fiber.tag === ForwardRef) {
+      return this._currentFiber().pendingProps;
+    }
     return this._currentFiber().memoizedProps;
   }
 

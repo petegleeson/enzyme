@@ -11,7 +11,7 @@ import {
 import { ITERATOR_SYMBOL, sym } from 'enzyme/build/Utils';
 
 import './_helpers/setupAdapters';
-import { createClass, createContext, createPortal } from './_helpers/react-compat';
+import { createClass, createContext, createPortal, forwardRef } from './_helpers/react-compat';
 import {
   describeWithDOM,
   describeIf,
@@ -296,6 +296,39 @@ describeWithDOM('mount', () => {
       expect(children.at(0).props().test).to.equal('123');
       expect(wrapper.find(TestItem)).to.have.length(3);
       expect(wrapper.find(TestItem).first().props().test).to.equal('123');
+    });
+  });
+
+  describeIf(REACT163, 'forwardRef Components', () => {
+    it('should show correct displayName', () => {
+      const MyButton = forwardRef((props, ref) => <button ref={ref}>{props.children}</button>);
+      MyButton.displayName = 'BasicButton';
+
+      const wrapper = mount(<MyButton>Click me</MyButton>);
+      expect(wrapper.debug()).to.equal((
+        `<ForwardRef(${MyButton.displayName})>
+  <button>
+    Click me
+  </button>
+</ForwardRef(${MyButton.displayName})>`
+      ));
+    });
+
+    it('should find forwardRef element', () => {
+      const AnotherComponent = ({ children }) => <span>{children}</span>;
+      const testRef = () => {};
+      const SomeComponent = forwardRef((props, ref) => (
+        <div ref={ref}>
+          <AnotherComponent {...props}>
+            <span className="child1" />
+            <span className="child2" />
+          </AnotherComponent>
+        </div>
+      ));
+
+      const wrapper = mount(<SomeComponent foo="hello" ref={testRef} />);
+      const results = wrapper.find(SomeComponent);
+      expect(results.props()).to.deep.equal({ foo: 'hello' });
     });
   });
 

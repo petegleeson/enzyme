@@ -1,6 +1,6 @@
 {
   "name": "@pgleeson/enzyme-adapter-react-16",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "JavaScript Testing utilities for React",
   "homepage": "http://airbnb.io/enzyme/",
   "main": "build",
@@ -43,13 +43,13 @@
     "react-test-renderer": "^16.0.0-0"
   },
   "peerDependencies": {
-    "enzyme": "https://registry.npmjs.org/@pgleeson/enzyme/-/enzyme-3.3.6.tgz",
+    "enzyme": "https://registry.npmjs.org/@pgleeson/enzyme/-/enzyme-3.3.7.tgz",
     "react": "^16.0.0-0",
     "react-dom": "^16.0.0-0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "enzyme": "https://registry.npmjs.org/@pgleeson/enzyme/-/enzyme-3.3.6.tgz",
+    "enzyme": "https://registry.npmjs.org/@pgleeson/enzyme/-/enzyme-3.3.7.tgz",
     "eslint": "^4.18.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",

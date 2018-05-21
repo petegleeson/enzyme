@@ -236,10 +236,15 @@ class ReactWrapper {
     if (this[ROOT] !== this) {
       throw new Error('ReactWrapper::unmount() can only be called on the root');
     }
-    this.single('unmount', () => {
+    // TODO remove if and use #single
+    // this if statement is a special hack because so many of our tests
+    // call unmount more than once.
+    if (this.length === 1) {
+    // this.single('unmount', () => {
       this[RENDERER].unmount();
       this.update();
-    });
+    // });
+    }
     return this;
   }
 

@@ -1,5 +1,3 @@
-# Enzyme
-
 # This is a forked version of Enzyme! ⚠️
 
 Why fork? In [Atlaskit](https://atlaskit.atlassian.com/), we depend on Enzyme
@@ -11,6 +9,26 @@ The changes in [this PR](https://github.com/airbnb/enzyme/pull/1592) fix this pr
 
 This fork includes those changes and is intended to be a temporary solution until
 [full React 16.3 support](https://github.com/airbnb/enzyme/issues/1553) is released. Please reach out to us if we can help to get the real release out the door.
+
+## Using this fork
+
+The most seamless way to use this fork is to point the `enzyme` and `enzyme-adapter-react-16`
+dependencies directly at urls. In your package.json:
+
+```diff
+-    "enzyme": "^3.3.0",
+-    "enzyme-adapter-react-16": "^1.1.1",
++    "enzyme": "https://registry.npmjs.org/@pgleeson/enzyme/-/enzyme-3.3.7.tgz",
++    "enzyme-adapter-react-16": "https://registry.npmjs.org/@pgleeson/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.1.7.tgz",
+```
+
+The `enzyme-adapter-react-16` needs version 16.3.2 of `react-test-renderer`. It
+might be necessary to run `yarn upgrade enzyme-adapter-react-16` to ensure it's
+dependencies are up to date. Run `yarn why react-test-renderer` to verify
+`enzyme-adapter-react-16` is using version 16.3.2.
+
+
+# Enzyme
 
 [![Join the chat at https://gitter.im/airbnb/enzyme](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/airbnb/enzyme?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
